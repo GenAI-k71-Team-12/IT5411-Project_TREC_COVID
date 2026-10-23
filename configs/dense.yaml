@@ -1,0 +1,22 @@
+# GĐ2 — nhánh vector (MedCPT bi-encoder)
+model:
+  query_encoder:   ncbi/MedCPT-Query-Encoder
+  article_encoder: ncbi/MedCPT-Article-Encoder
+  # LƯU Ý: hai checkpoint phải đi cùng nhau.
+  # Trộn Query-Encoder với Article-Encoder của model khác sẽ ra vector
+  # ở hai không gian khác nhau -> cosine vô nghĩa.
+
+embedding:
+  dim: 768
+  max_length: 512
+  normalize_l2: true          # bắt buộc: IP = cos chỉ khi đã chuẩn hoá
+
+index:
+  type: IndexFlatIP           # KHÔNG có bước train
+  path: indexes/faiss/articles.faiss
+
+encode:
+  batch_size: 32
+  device: auto
+
+top_k: 1000

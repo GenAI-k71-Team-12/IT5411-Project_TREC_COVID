@@ -1,0 +1,38 @@
+# GĐ4 — trích dẫn mức câu
+# Chạy SAU khi có thứ hạng cuối, CHỈ cho trang đang hiển thị.
+
+documents_per_page: 10
+max_sentences_per_doc: 5      # câu ứng viên lấy từ abstract
+sentences_in_output: 1        # số câu hiển thị
+
+splitter:
+  min_length: 30              # bỏ câu ngắn hơn (ký tự)
+  abbreviations:              # không cắt câu sau các từ này
+    - al
+    - "e.g"
+    - "i.e"
+    - vs
+    - Fig
+    - No
+    - Dr
+    - approx
+    - ref
+
+scoring:
+  method: cross_encoder       # cross_encoder | lexical
+  model: ncbi/MedCPT-Cross-Encoder
+  max_length: 128             # câu ngắn — không cần 512
+  batch_size: 32
+  fallback_below: 0.30        # dưới ngưỡng -> hiển thị 2 câu đầu abstract
+
+highlight:
+  stem: true
+  css_class: mark
+
+cache:
+  enabled: true
+  key: [query_hash, cord_uid]
+  max_entries: 500
+
+# Bất biến: snippet là trích NGUYÊN VĂN, không sinh văn bản.
+verbatim_only: true

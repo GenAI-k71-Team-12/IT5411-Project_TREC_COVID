@@ -1,0 +1,15 @@
+# GĐ3 — cross-encoder
+model: ncbi/MedCPT-Cross-Encoder
+
+input:
+  fields: [title, abstract]
+  max_length: 512
+
+top_k: 50                     # chấm 50 cặp mỗi truy vấn
+batch_size: 32
+device: auto
+
+# BẮT BUỘC: sau rerank phải ghi điểm đơn điệu giảm theo thứ hạng cuối.
+# Nếu lẫn thang điểm (cross-encoder 0-1 vs BM25 0-30) trong cùng một cột
+# score của run file, trec_eval sẽ sắp xếp lại theo score và đảo thứ hạng.
+write_scores_monotonic: true

@@ -1,0 +1,15 @@
+# GĐ2 — nhánh từ khoá (Lucene BM25)
+implementation: pyserini        # dự phòng: bm25s
+analyzer: EnglishAnalyzer       # stemming Porter + stopword tiếng Anh
+
+k1: 0.9     # hiệu chỉnh trên dev (mặc định Lucene = 1.2)
+b: 0.4      # hiệu chỉnh trên dev (mặc định = 0.75)
+
+# CORD-19 có abstract dài và nhiều thuật ngữ lặp -> b thấp hơn mặc định
+# cho kết quả tốt hơn trên tập dev.
+
+top_k: 1000                     # đủ sâu cho mọi độ đo
+
+fields:
+  title: 2.0
+  abstract: 1.0

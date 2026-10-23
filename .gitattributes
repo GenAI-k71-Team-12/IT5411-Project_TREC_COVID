@@ -1,0 +1,17 @@
+* text=auto eol=lf
+
+*.py    text eol=lf
+*.md    text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.toml  text eol=lf
+*.ps1   text eol=crlf
+*.bat   text eol=crlf
+
+*.png   binary
+*.jpg   binary
+*.pdf   binary
+*.pptx  binary
+*.docx  binary
+*.faiss binary
+*.parquet binary

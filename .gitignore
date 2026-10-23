@@ -1,0 +1,55 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ---- Dữ liệu (không commit, hàng GB) ----
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/external/*
+!data/external/.gitkeep
+
+# ---- Chỉ mục & mô hình ----
+indexes/lucene/*
+!indexes/lucene/.gitkeep
+indexes/faiss/*
+!indexes/faiss/.gitkeep
+models/
+*.faiss
+*.index
+*.pt
+*.bin
+*.safetensors
+
+# ---- Kết quả chạy ----
+runs/*
+!runs/.gitkeep
+results/*
+!results/.gitkeep
+logs/
+*.log
+
+# ---- Môi trường & bí mật ----
+.env
+.env.local
+
+# ---- Hệ điều hành / IDE ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+~$*

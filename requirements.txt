@@ -1,0 +1,34 @@
+# =====================================================================
+# Thư viện chạy thật. Chưa chốt phiên bản.
+# Sau khi cài xong trên máy chuẩn, chạy:
+#     pip freeze > requirements.lock.txt
+# để chốt lại phiên bản cho cả nhóm.
+# =====================================================================
+
+# ---- Truy xuất từ khoá ----
+# pyserini cần JDK 11+. Kiểm tra: java -version
+pyserini
+bm25s              # phương án dự phòng nếu không cài được Java
+
+# ---- Truy xuất vector ----
+faiss-cpu
+numpy
+pandas
+pyarrow
+
+# ---- Mô hình ----
+torch
+transformers
+huggingface-hub
+sentencepiece      # tokenizer của PubMedBERT (MedCPT)
+
+# ---- Ứng dụng ----
+flask
+pyyaml
+python-dotenv
+tqdm
+
+# ---- Đánh giá ----
+# trec_eval là chương trình C, tải riêng:
+#     https://github.com/usnistgov/trec_eval
+# Không có trên PyPI.

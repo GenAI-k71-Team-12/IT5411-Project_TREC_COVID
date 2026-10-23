@@ -1,0 +1,30 @@
+# Đường dẫn gốc — mọi đường dẫn khác trong repo tính từ đây.
+# Không hard-code đường dẫn tuyệt đối của từng máy.
+paths:
+  data_raw:      data/raw/cord19-2020-05-19
+  data_external: data/external
+  doc_store:     data/processed/doc_store.parquet
+  lucene_index:  indexes/lucene
+  faiss_index:   indexes/faiss/articles.faiss
+  runs:          runs
+  results:       results
+  models:        models
+
+# File của cuộc thi (tab Data)
+competition:
+  topics:            data/external/topics-rnd3.csv
+  docids:            data/external/docids-rnd3.txt
+  qrels:             data/external/qrels.csv
+  n_topics:          40
+  n_topics_judged:   35    # topic 36-40 chưa có phán định
+
+# Trường dùng để truy xuất
+fields:
+  primary:      cord_uid
+  search:       [title, abstract]
+  title_weight: 2
+
+runtime:
+  seed: 42
+  device: auto             # auto | cpu | cuda
+  num_workers: 4
