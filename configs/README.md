@@ -15,8 +15,8 @@ Tham số sau ghi đè tham số trước.
 
 | File | Tầng | Nội dung |
 |---|---|---|
-| `base.yaml` | — | đường dẫn, file của cuộc thi, device |
-| `bm25.yaml` | GĐ2 | `k1`, `b`, fielded, top-k |
+| `base.yaml` | — | đường dẫn, file của cuộc thi, trường truy vấn (`query_field`), device |
+| `bm25.yaml` | GĐ2 | `k1`, `b`, `title_weight` (một trường, title lặp), top-k |
 | `dense.yaml` | GĐ2 | MedCPT, chiều vector, `IndexFlatIP` |
 | `fusion.yaml` | GĐ3 | RRF / Weighted RRF / Convex |
 | `rerank.yaml` | GĐ3 | Cross-Encoder, top-50 |

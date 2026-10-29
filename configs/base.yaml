@@ -17,6 +17,10 @@ competition:
   qrels:             data/external/qrels.csv
   n_topics:          40
   n_topics_judged:   35    # topic 36-40 chưa có phán định
+  # Trường văn bản dùng làm truy vấn: query | question | narrative.
+  # CHƯA CHỐT — phải đo cả ba rồi mới sửa dòng này (xem docs/ROADMAP.md).
+  # Tạm dùng `query`: ngắn nhất, để baseline BM25 chạy được ngay khi có dữ liệu.
+  query_field:       query
 
 # Trường dùng để truy xuất
 fields:

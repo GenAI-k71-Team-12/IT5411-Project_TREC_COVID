@@ -25,8 +25,8 @@ Ký hiệu người phụ trách: **Người 1** (Dữ liệu & BM25) · **Ngư�
 ### Nhánh Lexical — Người 1 (BM25)
 | # | Việc | Xong khi |
 |---|---|---|
-| 1.1 | Chuẩn hoá văn bản hai làn: làn an toàn dùng chung + `normalize_query()` escape ký tự Lucene | Unit test: NBSP, gạch nối Unicode, HTML entity, query có `(` `)` `"` |
-| 1.2 | Dựng chỉ mục Lucene fielded (`title² + abstract`) qua `pyserini` (hoặc `bm25s`) | `indexes/lucene/`, nạp lại được |
+| 1.1 | Chuẩn hoá an toàn dùng chung cho document **và** query (một hàm duy nhất); stemming/stopword chỉ ở analyzer; `escape_lucene()` là hàm riêng, không gọi mặc định | Unit test: NBSP, gạch nối Unicode, HTML entity, query có `(` `)` `"` — xem ADR [0007](adr/0007-mot-lan-chuan-hoa-dung-chung.md) |
+| 1.2 | Dựng chỉ mục BM25 **một trường** `title` lặp 2 lần + `abstract` (xấp xỉ `title² + abstract`) qua `pyserini`, dự phòng `bm25s` | `indexes/lucene/` + `meta.json`, nạp lại được — xem ADR [0006](adr/0006-mot-truong-van-ban-lap-title.md) |
 | 1.3 | Viết hàm `search_bm25(query, top_k=1000) -> list[ScoredDocument]` | Trả đúng schema, latency < 500 ms |
 | 1.4 | Hiệu chỉnh `k1`, `b` trên tập dev | Ghi kết quả vào `results/`, chốt trong `configs/bm25.yaml` |
 

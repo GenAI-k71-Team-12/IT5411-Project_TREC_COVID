@@ -34,8 +34,9 @@ Phân công được chia theo **phương pháp truy xuất**, không theo giai 
 |---|---|
 | **Doc Store:** `metadata.csv` → parquet, chuẩn hoá, giữ `abstract` nguyên chuỗi | `src/trec_covid/io/doc_store.py`, `scripts/01_build_docstore.py` |
 | Bảng ánh xạ `position → cord_uid` cho FAISS | `data/processed/docid_order.parquet` |
-| Chuẩn hoá văn bản hai làn: làn an toàn dùng chung + `normalize_query()` escape ký tự Lucene | `src/trec_covid/preprocess/text.py` |
-| Xây dựng chỉ mục Lucene BM25 (`title² + abstract`) | `src/trec_covid/index/bm25_index.py` |
+| Chuẩn hoá an toàn dùng chung cho document và query; `escape_lucene()` riêng, chỉ bật khi dùng raw query parser | `src/trec_covid/preprocess/text.py` |
+| Xây dựng chỉ mục BM25 một trường (`title` lặp ×2 + `abstract`, xấp xỉ `title² + abstract`) | `src/trec_covid/index/bm25_index.py` |
+| Đọc topic cuộc thi (`query` / `question` / `narrative`) | `src/trec_covid/io/topics.py` |
 | Truy vấn BM25 top-1000 | `src/trec_covid/retrieve/bm25.py` |
 | Tinh chỉnh siêu tham số `k1`, `b` trên tập dev | `configs/bm25.yaml` |
 | Script dựng chỉ mục BM25 | `scripts/02_build_bm25_index.py` |

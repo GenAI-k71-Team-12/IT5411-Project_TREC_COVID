@@ -23,7 +23,7 @@ CORD-19 (19/05/2020)
       │
  [GĐ1] Tiền xử lý & xây chỉ mục  (một lần, ~2–3 giờ)
       │      Doc Store (title + abstract)   ← giữ nguyên văn, KHÔNG lưu câu đã tách
-      ├──► Lucene BM25 (fielded)            ← title² + abstract, EnglishAnalyzer
+      ├──► Lucene BM25 (một trường)         ← title lặp ×2 + abstract (xấp xỉ title² + abstract), EnglishAnalyzer
       └──► FAISS IndexFlatIP (MedCPT)       ← 768 chiều, chuẩn hoá L2 → IP = cos
 
 Query
@@ -67,7 +67,7 @@ TREC_COVID_TVDL/
 ├─ src/trec_covid/           # Mã nguồn chính (package Python)
 │  ├─ config.py              # Đọc/merge YAML
 │  ├─ cli.py                 # Entry point thống nhất
-│  ├─ io/                    # Đọc CORD-19, Doc Store
+│  ├─ io/                    # Đọc CORD-19, Doc Store, topic cuộc thi
 │  ├─ preprocess/            # Chuẩn hoá văn bản, tách câu
 │  ├─ index/                 # Dựng chỉ mục BM25 + FAISS
 │  ├─ retrieve/              # Hai nhánh truy xuất

@@ -27,8 +27,8 @@ Văn bản đưa vào truy xuất: `title + abstract`. **Không dùng full-text*
 
 ### 1.2 Chỉ mục BM25
 
-- Lucene qua `pyserini`.
-- **Fielded**: `title` trọng số 2, `abstract` trọng số 1.
+- Lucene qua `pyserini` (dự phòng `bm25s` khi máy không có JDK — cùng ngữ nghĩa, xem ADR [0006](adr/0006-mot-truong-van-ban-lap-title.md)).
+- **Một trường văn bản**: `title` lặp 2 lần rồi tới `abstract` — **xấp xỉ** `title² + abstract`, không phải fielded BM25 thật (lặp title làm `|d|` dài ra nên ảnh hưởng hệ số `b`).
 - `EnglishAnalyzer`: stemming Porter + bỏ stopword tiếng Anh.
 - `k1 = 0.9`, `b = 0.4` — hiệu chỉnh trên tập dev (mặc định Lucene là 1.2 / 0.75; CORD-19 có abstract dài và nhiều thuật ngữ lặp nên `b` thấp hơn cho kết quả tốt hơn).
 - Lấy **1000 ứng viên** mỗi truy vấn — đủ sâu cho mọi độ đo.
