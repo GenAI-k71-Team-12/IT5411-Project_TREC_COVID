@@ -5,8 +5,9 @@ PHẢI tuân thủ các dataclass trong file này để đảm bảo khả năng
 """
 
 from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -36,7 +37,7 @@ class ScoredDocument:
     score: float
     rank: int                # 1-indexed, bắt buộc truyền: 1 = hạng cao nhất
     source: str = ""         # 'bm25', 'dense', 'rrf', 'rerank'
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.rank < 1:
@@ -91,4 +92,4 @@ class SearchResponse:
     page_size: int
     total_pages: int
     latency_ms: float
-    results: List[SearchResultItem]
+    results: list[SearchResultItem]

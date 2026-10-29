@@ -52,8 +52,8 @@ User Query ──► [Preprocess] ────────┤                   
 > **Quy tắc:** Nếu bài viết không có abstract, trường `abstract` phải là chuỗi rỗng `""` (không dùng `NaN` hay `None`).
 
 > ⏰ **Bàn giao hai đợt (quan trọng cho tiến độ):**
-> - **Đợt 1 — trong 2 ngày đầu:** Doc Store **tối giản 3 trường** `cord_uid`, `title`, `abstract`. Đây là **mốc chặn**: Người 2 cần nó để bắt đầu encode ~170k bài (2–3 giờ), không thể chờ đủ 8 trường.
-> - **Đợt 2 — sau đó:** bổ sung `authors`, `journal`, `publish_time`, `doi`, `pmcid` + `docid_order.parquet`. Các trường này **không tham gia vào vector**, nên **không phải encode lại**.
+> - **Đợt 1 — trong 2 ngày đầu:** Doc Store **tối giản 3 trường** `cord_uid`, `title`, `abstract` **+ `docid_order.parquet`** (sinh ngay, vì FAISS cần `position -> cord_uid` để Người 2 dựng chỉ mục). Đây là **mốc chặn**: Người 2 cần nó để bắt đầu encode ~170k bài (2–3 giờ), không thể chờ đủ 8 trường.
+> - **Đợt 2 — sau đó:** ghi đè **cùng đường dẫn** bằng bản đủ `authors`, `journal`, `publish_time`, `doi`, `pmcid`. Các trường này **không tham gia vào vector**, thứ tự dòng **không đổi**, nên **không phải encode lại**.
 >
 > **Bất biến bắt buộc:** thứ tự dòng của Doc Store phải tất định. FAISS trả **vị trí số nguyên**, nên `docid_order.parquet` (`position`, `cord_uid`) phải được sinh cùng lúc và `assert len(docids) == index.ntotal`. Không ai được `sort_values()` lại Doc Store sau khi đã encode.
 

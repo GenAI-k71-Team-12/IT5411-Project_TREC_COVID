@@ -131,20 +131,30 @@ Sau đó đặt dữ liệu vào `data/`:
 | `docids-rnd3.txt` | tab Data của cuộc thi | `data/external/` |
 | `qrels.csv` | tab Data của cuộc thi | `data/external/` |
 
-> Mã nguồn chưa được viết. Xem `docs/ROADMAP.md` để biết thứ tự triển khai.
+> Nhánh **dữ liệu + BM25** (Người 1) đã có mã nguồn: `io/doc_store.py`,
+> `preprocess/text.py`, `index/bm25_index.py`, `retrieve/bm25.py` + 2 script đầu.
+> Các nhánh còn lại đang ở mức khung. Xem `docs/ROADMAP.md` để biết thứ tự triển khai.
 
 ---
 
 ## 5. Lệnh chạy (dự kiến)
 
 ```powershell
-python scripts/01_build_docstore.py      # CORD-19 → Doc Store
-python scripts/02_build_bm25_index.py    # Doc Store → Lucene
+# Đợt 1 — mốc chặn ngày 2: 3 trường lõi, để Người 2 bắt đầu encode
+python scripts/01_build_docstore.py --minimal
+
+# Đợt 2 — đủ 8 trường + docid_order.parquet (thứ tự dòng không đổi)
+python scripts/01_build_docstore.py
+
+python scripts/02_build_bm25_index.py    # Doc Store → Lucene BM25
 python scripts/03_build_faiss_index.py   # Doc Store → FAISS (~2–3 giờ)
 python scripts/04_make_run.py --config configs/fusion.yaml
 python scripts/05_evaluate.py --run runs/rrf.txt
 python scripts/06_serve_web.py           # http://localhost:5000
 ```
+
+> Máy chưa cài `pyserini` hoặc chưa có Java thì thêm `--backend bm25s` vào lệnh
+> số 2 — chỉ mục vẫn dựng được (chậm hơn, dùng cho test/CI).
 
 ---
 
