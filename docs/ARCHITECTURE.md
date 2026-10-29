@@ -144,7 +144,7 @@ Lưu ý:
 
 ---
 
-## Sơ đồ phụ thuộc module
+## Sơ đồ phụ thuộc module & Quy ước dữ liệu
 
 ```
 config ──► io ──► preprocess ──► index ──► retrieve ──► fuse ──► rerank ──► postfilter
@@ -154,4 +154,6 @@ config ──► io ──► preprocess ──► index ──► retrieve ─�
                                                         snippet ◄────────────┘
 ```
 
-Quy tắc: **luồng dữ liệu một chiều**. Module sau được import module trước; không được import ngược (ví dụ `index` không được import `web`).
+- **Quy tắc phụ thuộc:** Luồng dữ liệu một chiều. Module sau được import module trước; không được import ngược.
+- **Quy ước dữ liệu chung (Data Contracts):** Để các thành viên phát triển độc lập không bị xung đột khi tích hợp, tất cả các module sử dụng chung các dataclass định nghĩa tại [`src/trec_covid/schemas.py`](../src/trec_covid/schemas.py). Chi tiết đặc tả đầu vào / đầu ra và dữ liệu mẫu (mock data) được quy định tại [`docs/DATA_CONTRACTS.md`](DATA_CONTRACTS.md).
+

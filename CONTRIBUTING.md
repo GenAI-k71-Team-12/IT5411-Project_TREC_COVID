@@ -1,6 +1,6 @@
 # Quy ước đóng góp
 
-Nhóm 4 người, làm song song trên 4 giai đoạn khác nhau. Tài liệu này là luật chung để tránh giẫm chân nhau.
+Nhóm 4 người, làm song song trên 4 mảng phương pháp khác nhau. Tài liệu này là luật chung để tránh giẫm chân nhau.
 
 ---
 
@@ -9,24 +9,33 @@ Nhóm 4 người, làm song song trên 4 giai đoạn khác nhau. Tài liệu n�
 Nhánh `main` **luôn chạy được**. Không commit trực tiếp lên `main`.
 
 ```
-main
- └─ feat/<mã-người>-<phạm-vi>      # tính năng mới
-     fix/<mã-người>-<phạm-vi>      # sửa lỗi
-     exp/<mã-người>-<thí-nghiệm>   # thí nghiệm, không merge vào main
-     docs/<mã-người>-<phạm-vi>     # tài liệu
+main                                   # bản ổn định, chỉ merge từ dev
+ └─ dev                                # nhánh tích hợp của nhóm
+     └─ feat/n<1-4>-<phạm-vi>          # tính năng mới
+         fix/n<1-4>-<phạm-vi>          # sửa lỗi
+         exp/n<1-4>-<thí-nghiệm>       # thí nghiệm, không merge vào dev
+         docs/n<1-4>-<phạm-vi>         # tài liệu
 ```
 
-Mã người: `a`, `b`, `c`, `d` (xem `docs/TEAM.md`).
+Mã người: `n1` · `n2` · `n3` · `n4` — tương ứng Người 1–4 trong [`docs/TEAM.md`](docs/TEAM.md).
+
+| Mã | Phụ trách |
+|---|---|
+| `n1` | Dữ liệu, Doc Store, BM25 |
+| `n2` | Dense vector, FAISS, MedCPT |
+| `n3` | Fusion, Rerank, Đánh giá |
+| `n4` | Snippet, Web UI |
 
 Ví dụ:
 
 ```
-feat/a-doc-store
-feat/b-bm25-retriever
-feat/c-rrf-fusion
-fix/b-faiss-l2norm
-exp/c-rerank-top100
-docs/d-adr-snippet
+feat/n1-doc-store
+feat/n1-bm25-retriever
+feat/n2-faiss-index
+feat/n3-rrf-fusion
+fix/n2-faiss-l2norm
+exp/n3-rerank-top100
+docs/n4-adr-snippet
 ```
 
 Nhánh sống tối đa **1 tuần**. Lâu hơn thì tách nhỏ lại.
@@ -71,7 +80,7 @@ docs(adr): ghi quyết định tách câu lúc truy vấn
 
 ## 3. Pull request
 
-1. Mở PR vào `main`, tiêu đề giống commit.
+1. Mở PR vào `dev` (không phải `main`), tiêu đề giống commit.
 2. Điền template trong `.github/PULL_REQUEST_TEMPLATE.md`.
 3. **Cần ít nhất 1 người khác approve.** Không tự merge PR của mình.
 4. PR quá 400 dòng diff → tách nhỏ.

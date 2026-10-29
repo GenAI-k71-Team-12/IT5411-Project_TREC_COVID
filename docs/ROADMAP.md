@@ -1,131 +1,116 @@
 # Kế hoạch triển khai
 
-Thứ tự công việc bám theo **phụ thuộc dữ liệu**, không phải theo số thứ tự giai đoạn. Việc nào không cần dữ liệu thật thì làm trước bằng dữ liệu giả.
+Thứ tự công việc bám theo **phụ thuộc dữ liệu** và **hợp đồng giao tiếp**. Mỗi người có thể làm việc độc lập ngay từ tuần đầu tiên bằng cách sử dụng dữ liệu giả lập (mock data) theo chuẩn [`docs/DATA_CONTRACTS.md`](docs/DATA_CONTRACTS.md).
 
-Ký hiệu người phụ trách: **A** · **B** · **C** · **D** (xem `docs/TEAM.md`).
+Ký hiệu người phụ trách: **Người 1** (Dữ liệu & BM25) · **Người 2** (Dense) · **Người 3** (Fusion · Rerank · Đánh giá) · **Người 4** (Snippet & Web UI).
 
 ---
 
-## Mốc 0 — Khởi tạo (tuần 1, cả nhóm)
+## Mốc 0 — Khởi tạo & Chốt quy ước (tuần 1, Cả nhóm)
 
 | # | Việc | Ai | Xong khi |
 |---|---|---|---|
-| 0.1 | Điền tên/MSSV vào `docs/TEAM.md` và bìa báo cáo | cả nhóm | không còn dấu `…` |
-| 0.2 | Chốt interface giữa các tầng (xem dưới) | cả nhóm | ghi vào `docs/ARCHITECTURE.md` |
-| 0.3 | Đặt dữ liệu vào `data/raw` và `data/external` | A | 4 file đúng vị trí |
-| 0.4 | `pip install -r requirements.txt` chạy được trên cả 4 máy | D | 4/4 máy không lỗi |
-
-### Interface cần chốt trước khi ai viết code
-
-```python
-# io
-def load_doc_store() -> pd.DataFrame: ...        # cột: cord_uid, title, abstract, journal, year, doi
-
-# retrieve
-def search(query: str, top_k: int = 1000) -> list[tuple[str, float]]: ...
-
-# fuse
-def fuse(runs: dict[str, list[tuple[str, float]]]) -> list[tuple[str, float]]: ...
-
-# rerank
-def rerank(query: str, candidates: list[str]) -> list[tuple[str, float]]: ...
-
-# postfilter
-def filter_residual(ranked: list[tuple[str, float]]) -> list[tuple[str, float]]: ...
-
-# snippet
-def make_snippet(query: str, doc: dict) -> str | None: ...
-```
-
-**Lý do chốt sớm:** bốn người code bốn tầng; nếu interface đổi giữa chừng thì cả ba tầng sau phải sửa lại.
+| 0.1 | Điền tên/MSSV vào `docs/TEAM.md` và bìa báo cáo | Cả nhóm | không còn dấu `…` |
+| 0.2 | Chốt Data Contracts & schemas | Cả nhóm | Thống nhất [`docs/DATA_CONTRACTS.md`](DATA_CONTRACTS.md) & [`src/trec_covid/schemas.py`](../src/trec_covid/schemas.py) |
+| 0.3 | Đặt dữ liệu vào `data/raw` và `data/external` | Người 1 | 4 file đúng vị trí |
+| 0.4 | `pip install -r requirements.txt` chạy được trên cả 4 máy | Cả nhóm | 4/4 máy không lỗi |
+| 0.5 | **Doc Store tối giản** (`cord_uid`, `title`, `abstract`) — mốc chặn ngày 2 | **Người 1** | `data/processed/doc_store.parquet` đọc được, ~170k dòng |
+| 0.6 | **Doc Store đầy đủ** 8 trường + `docid_order.parquet` | **Người 1** | Đủ trường, `len(docids) == index.ntotal` |
+| 0.7 | Kiểm chứng `docids-rnd3.txt` là danh sách *được phép* hay *bị loại* | Người 3 | Ghi kết luận vào `docs/adr/` |
 
 ---
 
-## Mốc 1 — Chỉ mục (tuần 1–2) — A
+## Mốc 1 — Xây dựng hai nhánh tìm kiếm độc lập (tuần 1–2)
+
+### Nhánh Lexical — Người 1 (BM25)
+| # | Việc | Xong khi |
+|---|---|---|
+| 1.1 | Chuẩn hoá văn bản hai làn: làn an toàn dùng chung + `normalize_query()` escape ký tự Lucene | Unit test: NBSP, gạch nối Unicode, HTML entity, query có `(` `)` `"` |
+| 1.2 | Dựng chỉ mục Lucene fielded (`title² + abstract`) qua `pyserini` (hoặc `bm25s`) | `indexes/lucene/`, nạp lại được |
+| 1.3 | Viết hàm `search_bm25(query, top_k=1000) -> list[ScoredDocument]` | Trả đúng schema, latency < 500 ms |
+| 1.4 | Hiệu chỉnh `k1`, `b` trên tập dev | Ghi kết quả vào `results/`, chốt trong `configs/bm25.yaml` |
+
+### Nhánh Semantic — Người 2 (Dense Vector)
+| # | Việc | Xong khi |
+|---|---|---|
+| 1.5 | Tích hợp checkpoint MedCPT Article Encoder & Query Encoder | Model nạp thành công trên GPU/CPU |
+| 1.6 | Encode toàn bộ corpus (~170k bài) thành vector 768 chiều | Chạy batching, lưu `indexes/faiss/` |
+| 1.7 | Chuẩn hoá L2 vector bài báo và nạp vào `IndexFlatIP` | Tích vô hướng khớp Cosine similarity |
+| 1.8 | Viết hàm `search_dense(query, top_k=1000) -> list[ScoredDocument]` | Trả đúng schema, latency < 500 ms |
+
+**Cổng kiểm soát:** Cả 2 nhánh chạy thử độc lập trên 35 topics, xuất run file baseline `runs/bm25.txt` và `runs/dense.txt` để đánh giá sơ bộ.
+
+---
+
+## Mốc 2 — Dung hợp & Reranker (tuần 2–3) — Người 3
+
+Làm việc với Mock Data từ tuần 1, sau đó nối với kết quả thật từ Người 1 và Người 2.
 
 | # | Việc | Xong khi |
 |---|---|---|
-| 1.1 | Đọc `metadata.csv` → Doc Store | `data/processed/doc_store.parquet`, ~170k dòng, kiểm tra số dòng khớp |
-| 1.2 | Đếm bài thiếu abstract | báo cáo con số, xác nhận vẫn giữ lại |
-| 1.3 | Dựng chỉ mục Lucene (`title² + abstract`) | `indexes/lucene/`, nạp lại được |
-| 1.4 | Hiệu chỉnh `k1`, `b` trên tập dev | ghi kết quả vào `results/`, chốt trong `configs/bm25.yaml` |
-| 1.5 | Encode toàn bộ corpus bằng MedCPT Article Encoder | `indexes/faiss/`, ~2–3 giờ, cache xuống đĩa |
-| 1.6 | Chuẩn hoá L2 + nạp `IndexFlatIP` | cùng một query, `IP` khớp `cosine` sai số < 1e-5 |
-| 1.7 | Kiểm tra toàn vẹn chỉ mục | in SHA256, ghi vào `docs/` để người khác xác nhận |
+| 2.1 | Cài đặt RRF chuẩn (`k = 60`) trên 2 danh sách `ScoredDocument` | Vượt được cả hai baseline đơn nhánh |
+| 2.2 | Cài đặt Weighted RRF (tối ưu trọng số $w$ trên tập dev) | Tìm được $w$ tốt nhất, lưu config |
+| 2.3 | Cài đặt Convex min-max kết hợp điểm số | Min-max chuẩn hóa theo từng truy vấn |
+| 2.4 | Tích hợp MedCPT Cross-Encoder chấm top-50 bài sau dung hợp | Batch rerank chạy mượt mà |
+| 2.5 | Đảm bảo tính đơn điệu giảm của điểm số sau rerank | `score[i] >= score[i+1]` cho toàn bộ top-1000 |
+| 2.6 | Lọc residual theo `docids-rnd3.txt` (**chế độ tùy chọn**) + assert bất biến | Định dạng đúng 6 cột TREC; điểm giảm dần, không trùng docid |
+| 2.7 | Thí nghiệm **có / không** lọc residual, so `nDCG@10` | Chốt ADR 0005 kèm số liệu hai chiều |
 
-**Cổng kiểm soát:** 10 truy vấn mẫu, mỗi nhánh trả đúng 1000 kết quả trong < 10 giây. Chưa qua cổng này thì B và C chưa bắt đầu được.
+**Cổng kiểm soát:** Bảng so sánh 3 công thức fusion + rerank, cải thiện vượt trội so với baseline.
 
 ---
 
-## Mốc 2 — Truy xuất (tuần 2) — B
+## Mốc 3 — Trích đoạn Snippet & Highlight (tuần 2–3) — Người 4
+
+Làm việc với Mock Documents từ tuần 1.
 
 | # | Việc | Xong khi |
 |---|---|---|
-| 2.1 | Hàm `search()` cho BM25 | chạy trên chỉ mục thật, < 500 ms |
-| 2.2 | Hàm `search()` cho dense | encode query bằng **Query-Encoder** (không dùng Article) |
-| 2.3 | Chuẩn hoá truy vấn dùng chung | hai nhánh dùng **cùng** một hàm, tránh lệch |
-| 2.4 | Ghi chú các truy vấn mà hai nhánh bất đồng | ≥ 3 ví dụ, dùng cho slide "vì sao cần BM25" |
+| 3.1 | Thuật toán tách câu y sinh (regex nhận diện `et al.`, `Fig.`, `i.e.`, `0.5 mg.`) | Test case 5 abstract phức tạp không bị cắt cụt |
+| 3.2 | Thuật toán chấm điểm câu liên quan nhất với query | Chọn được câu dẫn chứng tiêu biểu |
+| 3.3 | Thuật toán tô sáng keyword (`<mark class="hl">...</mark>`) | Không làm vỡ định dạng HTML, khớp chính xác |
+| 3.4 | Xử lý bài không có abstract (fallback) | Hiển thị thông báo hoặc trích tiêu đề không vỡ UI |
+| 3.5 | Cơ chế cache snippet theo `(query, cord_uid)` | Lần 2 xem lại trang kết quả mất 0 ms |
 
-**Cổng kiểm soát:** chạy 35 topic, ghi ra 2 run file riêng (`runs/bm25.txt`, `runs/dense.txt`) và chấm bằng `trec_eval` — có số liệu baseline của từng nhánh.
-
----
-
-## Mốc 3 — Fusion + rerank (tuần 3) — C
-
-| # | Việc | Xong khi |
-|---|---|---|
-| 3.1 | RRF chuẩn, `k = 60` | vượt được cả hai baseline đơn nhánh |
-| 3.2 | Weighted RRF, học `w` trên dev | tìm được `w` tốt nhất, ghi lại |
-| 3.3 | Convex sau min-max, học `α` trên dev | min-max tính trong từng truy vấn |
-| 3.4 | Cross-Encoder chấm top-50 | chạy batch, cắt 512 token |
-| 3.5 | **Ghi điểm đơn điệu giảm** sau rerank | kiểm tra bằng script: `score[i] >= score[i+1]` |
-| 3.6 | So sánh 3 công thức | bảng kết quả trong `results/` |
-
-**Cổng kiểm soát:** bảng so sánh 3 công thức + 2 baseline, chênh lệch có ý nghĩa.
+**Cổng kiểm soát:** Hàm `generate_snippets` trả về đúng `dict[str, SnippetResult]` cho 10 bài < 50 ms.
 
 ---
 
-## Mốc 4 — Hậu xử lý & web (tuần 3–4) — D
+## Mốc 4 — Xây dựng Web UI & Tích hợp Pipeline (tuần 2–4) — Người 4
 
-Làm song song từ tuần 1 bằng dữ liệu giả, không chờ chỉ mục thật.
-
-| # | Việc | Xong khi |
-|---|---|---|
-| 4.1 | Viết hàm tách câu + danh sách viết tắt | unit test với 5 abstract có `et al.`, `Fig.`, `0.5 mg.` |
-| 4.2 | Chấm câu `(query, câu)` theo batch | 50 cặp < 1 giây trên máy nhóm |
-| 4.3 | Tô sáng từ khoá | không tô sai chữ, không lệch vị trí |
-| 4.4 | Fallback bài không có abstract | hiển thị metadata, không vỡ layout |
-| 4.5 | Lọc residual theo `docids-rnd3.txt` | run file không chứa docid ngoài tập |
-| 4.6 | Ghi run file 6 cột | định dạng `topicid Q0 docid rank score tag` |
-| 4.7 | Wrapper `trec_eval` | `-m ndcg_cut.10`, `-m map`, `-m P.5`, `-m bpref` |
-| 4.8 | Web Flask: trang kết quả + phân trang 10 | chạy `localhost:5000` |
-| 4.9 | Cache snippet theo `(query, docid)` | lần 2 xem lại trang cũ: 0 ms |
-
-**Cổng kiểm soát:** mở web, gõ 1 truy vấn, thấy 10 kết quả có snippet tô sáng + trích dẫn nguồn, bấm sang trang 2 vẫn đúng.
+| # | Việc | Ai | Xong khi |
+|---|---|---|---|
+| 4.1 | Dựng khung ứng dụng Flask, routing, template Jinja2 — **mốc chặn cuối tuần 2, chạy bằng mock data** | Người 4 | `localhost:5000` chạy mượt với dữ liệu giả lập |
+| 4.2 | Thiết kế giao diện (search bar, responsive cards, metadata, snippet) | Người 4 | UI chuyên nghiệp, trực quan |
+| 4.3 | Tích hợp phân trang (10 bài/trang) và bộ lọc năm/journal | Người 4 | Chuyển trang giữ đúng state và query |
+| 4.4 | Nối toàn bộ pipeline: Query → BM25 + Dense → Fusion/Rerank → Snippet → UI | Người 4 | Tìm kiếm một từ khoá ra đầy đủ card + snippet tô sáng |
+| 4.5 | Chế độ so sánh (Debug Mode): điểm BM25 vs Dense vs Cross-Encoder trên UI | Người 4 | Hỗ trợ demo trực tiếp cho thầy cô |
+| 4.6 | CSS/JS/font cục bộ — **cấm CDN**, chạy được khi tắt mạng | Người 4 | Ngắt mạng vẫn render đúng |
 
 ---
 
-## Mốc 5 — Đánh giá đầy đủ (tuần 4) — B + C
+## Mốc 5 — Đánh giá toàn diện & Ablation (tuần 4) — Người 3
 
-| # | Việc | Xong khi |
-|---|---|---|
-| 5.1 | Bảng ablation: BM25 · Dense · RRF · +rerank · +residual | 5 dòng, cùng 35 topic |
-| 5.2 | Kiểm tra 5 topic 36–40 bị loại khỏi trung bình | ghi rõ trong báo cáo "đánh giá trên 35 topic" |
-| 5.3 | Chạy lại toàn bộ từ commit sạch | kết quả trùng khớp (tái lập 100%) |
-| 5.4 | Ghi kèm commit hash vào mỗi file kết quả | `results/*.txt` có dòng đầu ghi hash + config |
+| # | Việc | Ai | Xong khi |
+|---|---|---|---|
+| 5.1 | Chạy `trec_eval` tính `nDCG@10`, `nDCG@20`, `MAP`, `P@5`, `bpref` trên 35 topics | Người 3 | Đầy đủ file log kết quả |
+| 5.2 | Lập bảng Ablation 5 tầng (BM25 → Dense → RRF → Rerank → Residual) — **mốc chặn cuối tuần 4** | Người 3 | Thể hiện rõ đóng góp của từng tầng |
+| 5.3 | Kiểm tra tính tái lập (Replicability) từ commit sạch | Người 3 | Kết quả trùng khớp 100% |
+| 5.4 | Ghi ADR 0005: có/không lọc residual, kèm số liệu hai chiều | Người 3 | ADR được merge vào `docs/adr/` |
+
+> **Bẫy khi chấm:** `trec_eval` mặc định **không** tính nDCG (phải truyền `-m ndcg_cut.10`); **không** dùng cờ `-c` khi qrels chỉ có 35/40 topic.
 
 ---
 
-## Mốc 6 — Báo cáo & thuyết trình (tuần 5)
+## Mốc 6 — Báo cáo & Thuyết trình (tuần 5) — Cả nhóm
 
-| # | Việc | Ai |
+| # | Việc | Ai phụ trách chính |
 |---|---|---|
-| 6.1 | Chương phương pháp | A + B |
-| 6.2 | Chương thực nghiệm & bảng kết quả | C |
-| 6.3 | Chương sản phẩm & demo | D |
-| 6.4 | Slide 7–10 phút, mỗi người 1–2 slide | cả nhóm |
-| 6.5 | Tập thuyết trình, bấm giờ | cả nhóm |
-| 6.6 | Chuẩn bị câu hỏi phản biện (xem dưới) | cả nhóm |
+| 6.1 | Viết chương Phương pháp (BM25, Dense, RRF, Cross-Encoder, Snippet) | Người 1, 2, 3, 4 viết phần của mình |
+| 6.2 | Viết chương Thực nghiệm, bảng số liệu Ablation | Người 3 chủ trì |
+| 6.3 | Viết chương Sản phẩm ứng dụng Web & Trích dẫn | Người 4 |
+| 6.4 | Thiết kế slide thuyết trình (mỗi người 2-3 slide phần mình) | Cả nhóm |
+| 6.5 | Tổng duyệt thuyết trình, chuẩn bị demo live và câu hỏi phản biện | Cả nhóm |
 
 ### Câu hỏi phản biện cần chuẩn bị sẵn
 

@@ -36,7 +36,7 @@ Query
       │      RRF (mức bài báo) ──► Cross-Encoder top-50
       │
  [GĐ4] Hậu xử lý
-      │      Lọc residual (docids-rnd3.txt)
+      │      Lọc residual (docids-rnd3.txt)  ← tùy chọn, chỉ cho đường mô phỏng thi
       │      Tách câu abstract của 10 bài đầu ──► Snippet có tô sáng
       │
       ▼
@@ -84,6 +84,7 @@ TREC_COVID_TVDL/
 ├─ results/                  # Kết quả trec_eval, bảng ablation
 ├─ docs/
 │  ├─ ARCHITECTURE.md        # Chi tiết kỹ thuật từng giai đoạn
+│  ├─ DATA_CONTRACTS.md      # Hợp đồng dữ liệu giữa 4 người (I/O, schema, mock data)
 │  ├─ TEAM.md                # Phân công, quy ước làm việc
 │  ├─ ROADMAP.md             # Mốc tiến độ
 │  ├─ adr/                   # Architecture Decision Records
@@ -99,7 +100,7 @@ TREC_COVID_TVDL/
 
 | Tầng | Thư viện | Ghi chú |
 |---|---|---|
-| BM25 | `pyserini` (Lucene) | cần **Java 11+**; phương án dự phòng `bm25s` |
+| BM25 | `pyserini` (Lucene) | cần **JDK 21** (bản pyserini cũ chỉ cần 11+); phương án dự phòng `bm25s` |
 | Vector | `faiss-cpu` | `IndexFlatIP`, không có bước train |
 | Mô hình | `transformers`, `torch` | MedCPT: Query / Article / Cross — 3 checkpoint riêng |
 | Dữ liệu | `pandas`, `pyarrow` | đọc `metadata.csv` |
@@ -147,13 +148,23 @@ python scripts/06_serve_web.py           # http://localhost:5000
 
 ---
 
-## 6. Nhóm
+## 6. Phân công nhóm & Quy ước phối hợp
 
-| Thành viên | Mảng phụ trách | Giai đoạn |
-|---|---|---|
-| … | Dữ liệu & chỉ mục | GĐ1 |
-| … | Truy xuất hai nhánh | GĐ2 |
-| … | Dung hợp & rerank | GĐ3 |
-| … | Trích dẫn, đánh giá & web | GĐ4 |
+Phân công theo **phương pháp truy xuất**, không theo giai đoạn: mỗi người sở hữu một nhánh dọc hoàn chỉnh (tự dựng chỉ mục, tự truy vấn, tự chấm điểm).
 
-Chi tiết phân công và quy ước nhánh/commit: `docs/TEAM.md` và `CONTRIBUTING.md`.
+| Thành viên | Mảng phụ trách | Nhiệm vụ chính | File sở hữu |
+|---|---|---|---|
+| **Người 1** | Dữ liệu & Tìm kiếm BM25 | Doc Store, chuẩn hoá văn bản, chỉ mục Lucene, truy xuất BM25, tuning `k1`/`b` | `io/doc_store.py`, `preprocess/text.py`, `index/bm25_index.py`, `retrieve/bm25.py` |
+| **Người 2** | Tìm kiếm Dense Vector | Encode MedCPT cho ~170k bài, chỉ mục FAISS `IndexFlatIP`, truy xuất Dense | `index/dense_index.py`, `retrieve/dense.py` |
+| **Người 3** | Dung hợp · Rerank · Đánh giá | 3 công thức fusion, Cross-Encoder, postfilter, `trec_eval`, ablation | `fuse/`, `rerank/`, `postfilter/`, `evaluate/` |
+| **Người 4** | Snippet & Web UI | Tách câu y sinh, chọn câu dẫn chứng, tô sáng, toàn bộ giao diện Flask | `snippet/`, `web/` |
+
+**Ba quy ước bắt buộc:**
+
+- **Đường găng:** Người 1 giao **Doc Store tối giản** (`cord_uid`, `title`, `abstract`) trong **2 ngày đầu** để Người 2 bắt đầu encode. Các trường metadata còn lại bổ sung sau — không cần encode lại.
+- **Lọc residual là chế độ tùy chọn**, không nằm trên đường đánh giá offline mặc định. Chỉ chốt sau khi đo cả hai cách (ADR 0005).
+- **Mỗi file có đúng một chủ.** Không còn việc nào ghi "cả nhóm cùng code X". Việc chung chỉ gồm: review PR, mỗi người một chương báo cáo, mỗi người 1–2 slide.
+
+- **Quy ước đầu vào - đầu ra (Data Contracts):** Xem chi tiết tại [`docs/DATA_CONTRACTS.md`](docs/DATA_CONTRACTS.md) và code schema tại [`src/trec_covid/schemas.py`](src/trec_covid/schemas.py).
+- **Phân công chi tiết:** Xem [`docs/TEAM.md`](docs/TEAM.md), [`docs/ROADMAP.md`](docs/ROADMAP.md) và [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
