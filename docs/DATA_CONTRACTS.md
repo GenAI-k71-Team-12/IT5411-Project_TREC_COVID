@@ -73,6 +73,22 @@ User Query ──► [Preprocess] ────────┤                   
   def search_bm25(query: str, top_k: int = 1000) -> list[ScoredDocument]:
       ...
   ```
+  (Bản đã cài đặt nhận thêm hai tham số **keyword-only** `index_dir=` và `config=`
+  để test/ablation trỏ vào chỉ mục khác — không phá vỡ chữ ký trên.)
+
+- **Đọc topic của cuộc thi:** `trec_covid.io.topics` — Người 1 giữ, Người 3 dùng
+  ```python
+  from trec_covid.io.topics import load_topics, build_queries
+
+  topics = load_topics("data/external/topics-rnd3.csv")
+  pairs = build_queries(topics, field=cfg["competition"]["query_field"])
+  # -> [(topic_id, văn bản truy vấn), ...] đã bỏ topic có văn bản rỗng
+  ```
+  `load_topics` **không** chuẩn hoá văn bản: chuẩn hoá nằm trong `search_bm25` /
+  `search_dense` để cả hai nhánh đi qua đúng một làn xử lý (ADR
+  [0007](adr/0007-mot-lan-chuan-hoa-dung-chung.md)).
+  Trường `query` / `question` / `narrative` chọn bằng
+  `competition.query_field` trong `configs/base.yaml` — **chưa chốt**, phải đo.
 
 ---
 
