@@ -165,6 +165,9 @@ Phân công theo **phương pháp truy xuất**, không theo giai đoạn: mỗi
 - **Lọc residual là chế độ tùy chọn**, không nằm trên đường đánh giá offline mặc định. Chỉ chốt sau khi đo cả hai cách (ADR 0005).
 - **Mỗi file có đúng một chủ.** Không còn việc nào ghi "cả nhóm cùng code X". Việc chung chỉ gồm: review PR, mỗi người một chương báo cáo, mỗi người 1–2 slide.
 
-- **Quy ước đầu vào - đầu ra (Data Contracts):** Xem chi tiết tại [`docs/DATA_CONTRACTS.md`](docs/DATA_CONTRACTS.md) và code schema tại [`src/trec_covid/schemas.py`](src/trec_covid/schemas.py).
-- **Phân công chi tiết:** Xem [`docs/TEAM.md`](docs/TEAM.md), [`docs/ROADMAP.md`](docs/ROADMAP.md) và [`CONTRIBUTING.md`](CONTRIBUTING.md).
+**Tài liệu liên quan:**
+
+- **Hợp đồng dữ liệu:** [`docs/DATA_CONTRACTS.md`](docs/DATA_CONTRACTS.md) và code schema tại [`src/trec_covid/schemas.py`](src/trec_covid/schemas.py).
+- **Phân công chi tiết & lịch trình:** [`docs/TEAM.md`](docs/TEAM.md), [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Quy ước đóng góp (nhánh, commit, PR):** [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
