@@ -88,6 +88,13 @@ class TestLoadTopics:
         assert topics[0].query == "coronavirus vaccine"
         assert topics[0].narrative == "d"
 
+    def test_alias_cot_dau_gach_noi_va_cai_nhoa(self, tmp_path):
+        rows = [{"topic-id": 9, "query": "coronavirus vaccine", "narrative": "n"}]
+        topics = load_topics(_write(tmp_path, rows, name="alias2.csv"))
+        assert topics[0].topic_id == 9
+        assert topics[0].query == "coronavirus vaccine"
+        assert topics[0].narrative == "n"
+
 
 class TestTopic:
     def test_text_theo_truong(self):

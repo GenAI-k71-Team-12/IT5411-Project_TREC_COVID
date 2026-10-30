@@ -28,11 +28,13 @@ import pandas as pd
 TOPIC_FIELDS: tuple[str, ...] = ("query", "question", "narrative")
 
 #: Tên cột có thể gặp ở các bản export khác nhau -> tên chuẩn.
+#: (`topic-id` và `topicId` là biến thể có dấu gạch nối/dấu hoa thường gặp
+#: trong file export gốc của TREC; phải nhận cả hai).
 _ALIASES: dict[str, tuple[str, ...]] = {
-    "topic_id": ("topic_id", "topic", "id", "number"),
+    "topic_id": ("topic_id", "topic-id", "topicId", "topic", "id", "number"),
     "query": ("query", "title", "topic_title"),
-    "question": ("question",),
-    "narrative": ("narrative", "description"),
+    "question": ("question", "questions"),
+    "narrative": ("narrative", "description", "narratives"),
 }
 
 
