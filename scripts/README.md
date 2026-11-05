@@ -11,9 +11,10 @@ theo số giai đoạn trong slide.
 | `04_make_run.py` | Truy xuất + fusion + rerank -> run file | |
 | `05_evaluate.py` | run file + qrels -> điểm | `pytrec_eval` (ADR 0009) |
 | `06_serve_web.py` | chạy web | |
+| `07_fusion_experiments.py` | 2 run nhánh -> lưới w/α, CV 5-fold -> bảng so sánh fusion | ~5 giây; chọn theo nDCG@10 condensed (ADR 0010) |
 
-**Đã chạy được:** `01`, `02` (nhánh dữ liệu + BM25, Người 1). Bốn script còn
-lại mới ở mức khung (chưa có mã).
+**Đã chạy được:** `01`, `02` (nhánh dữ liệu + BM25, Người 1); `05`, `07` (đánh giá và
+fusion, Người 3). Các script còn lại mới ở mức khung (chưa có mã).
 
 Tất cả script đọc tham số từ `configs/` (`--config bm25`), không hard-code
 đường dẫn tuyệt đối; `--out`, `--doc-store`, `--metadata` chỉ để ghi đè khi

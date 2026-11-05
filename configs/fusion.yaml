@@ -1,17 +1,21 @@
 # GĐ3 — dung hợp ở mức bài báo
 # Ba công thức chạy trên CÙNG một tập ứng viên (hợp 2 danh sách top-1000).
 # Không phải ba lựa chọn ngang nhau — đây là thiết kế thí nghiệm.
+#
+# Tham số dưới đây chọn bằng scripts/07_fusion_experiments.py: nDCG@10 condensed,
+# 5-fold CV theo topic (ADR 0010). Bảng: results/2026-11-05_fusion-comparison.csv.
+# Đo ngày 2026-11-05 với run dense TẠM (dense-tmp) — chạy lại khi có run của Người 2.
 
-active: rrf                   # rrf | weighted_rrf | convex
+active: convex                # CV cao nhất trong 3 công thức (0.5937; weighted_rrf 0.5899; rrf 0.5730)
 
 rrf:
-  k: 60                       # Cormack et al., SIGIR 2009
+  k: 60                       # Cormack et al., SIGIR 2009 — không tune
 
 weighted_rrf:
   k: 60
-  w_bm25: 1.0                 # sum(w) = 1, học trên tập dev
-  w_dense: 1.0
+  w_bm25: 0.4                 # sum(w) = 1; 4/5 fold chọn 0.4
+  w_dense: 0.6
 
 convex:
-  alpha: 0.5                  # s = alpha*bm25 + (1-alpha)*dense
+  alpha: 0.3                  # s = alpha*bm25 + (1-alpha)*dense; 3/5 fold chọn 0.3, 2/5 chọn 0.4
   minmax_scope: per_query     # tính trong từng truy vấn, KHÔNG toàn corpus
