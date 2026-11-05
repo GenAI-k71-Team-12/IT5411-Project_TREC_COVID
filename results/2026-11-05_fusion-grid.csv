@@ -1,4 +1,4 @@
-# commit=5cabee5 metric=condensed cv=5fold-seed42 tags=bm25;dense-tmp config=fusion
+# commit=64563ce-dirty metric=condensed cv=5fold-seed42 tags=bm25;dense-tmp config=fusion
 formula,param,ndcg10_selected
 weighted_rrf(w_bm25),0.0000,0.5943
 weighted_rrf(w_bm25),0.1000,0.5884

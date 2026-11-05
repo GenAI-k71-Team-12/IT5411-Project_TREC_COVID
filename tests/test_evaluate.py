@@ -129,3 +129,18 @@ class TestCondense:
         cond = summarize(evaluate_run(condense(run, qrels), qrels))["ndcg_cut_10"]
         assert cond == pytest.approx(1.0)
         assert raw < cond
+
+
+def test_lay_commit_truoc_khi_ghi_de_file(tmp_path, monkeypatch):
+    # Ghi đè một file kết quả đã track: nếu mở file trước khi lấy commit, git thấy
+    # file vừa bị xoá nội dung và provenance thành "-dirty" oan.
+    import pandas as pd
+
+    from trec_covid.evaluate import results
+
+    path = tmp_path / "r.csv"
+    path.write_text("old\n", encoding="utf-8")
+    seen = []
+    monkeypatch.setattr(results, "git_commit", lambda: seen.append(path.read_text()) or "abc")
+    results.write_results_csv(pd.DataFrame({"a": [1]}), path, {})
+    assert seen == ["old\n"]
