@@ -42,7 +42,9 @@ def write_results_csv(df: pd.DataFrame, path: str | Path, provenance: Mapping[st
     out = Path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
     meta = " ".join(f"{k}={v}" for k, v in provenance.items())
+    # Lấy commit TRƯỚC khi mở file: open("w") xoá nội dung file đã track, git sẽ báo dirty.
+    header = f"# commit={git_commit()} {meta}\n"
     with out.open("w", encoding="utf-8", newline="\n") as fh:
-        fh.write(f"# commit={git_commit()} {meta}\n")
+        fh.write(header)
         df.to_csv(fh, index=False, float_format="%.4f", lineterminator="\n")
     return out

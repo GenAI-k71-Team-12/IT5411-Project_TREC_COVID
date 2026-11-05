@@ -47,15 +47,15 @@ có qrels và không có tập dev riêng. Có hai vấn đề:
 
 ## Kết quả (2026-11-05, run dense tạm)
 
-`results/2026-11-05_fusion-comparison.csv`:
+`results/2026-11-05_fusion-comparison.csv` (mọi run cắt top-1000 theo hợp đồng):
 
 | run | nDCG@10 | condensed | CV 5-fold | bpref | tham số |
 |---|---|---|---|---|---|
 | bm25 | 0.2155 | 0.4601 | — | 0.2648 | |
 | dense | 0.1387 | 0.5943 | — | 0.2960 | |
-| rrf | 0.2068 | 0.5730 | 0.5730 | 0.3634 | k = 60 |
-| weighted_rrf | 0.1869 | 0.6019 | 0.5899 | 0.3707 | w_bm25 = 0.4 |
-| convex | 0.1801 | 0.6014 | **0.5937** | **0.3799** | α = 0.3 |
+| rrf | 0.2068 | 0.5730 | 0.5730 | 0.3248 | k = 60 |
+| weighted_rrf | 0.1869 | 0.6019 | 0.5899 | 0.3288 | w_bm25 = 0.4 |
+| convex | 0.1801 | 0.6014 | **0.5937** | **0.3380** | α = 0.3 |
 
 `fusion.active = convex`. Cần nói thẳng: trên nDCG@10 condensed, fusion chỉ **ngang** dense
 đơn lẻ (0.5937 so với 0.5943; thắng 13 topic, thua 18). Fusion chỉ hơn rõ ở bpref và MAP.
