@@ -131,3 +131,17 @@ class TestFuse:
     def test_active_la_thi_raise(self):
         with pytest.raises(ValueError, match="active"):
             fuse(MOCK_BM25_RESULTS, MOCK_DENSE_RESULTS, {"active": "combsum"})
+
+
+def test_fuse_cat_con_top_k_theo_hop_dong():
+    # DATA_CONTRACTS §2.3: đầu ra cuối là top-1000, không phải cả hợp hai danh sách.
+    cfg = {"active": "rrf", "rrf": {"k": 60}, "top_k": 2}
+    out = fuse(MOCK_BM25_RESULTS, MOCK_DENSE_RESULTS, cfg)
+    assert _uids(out) == ["doc_002", "doc_001"]
+    check_ranking(out)
+
+
+def test_config_fusion_top_k_1000():
+    from trec_covid.config import load_config
+
+    assert load_config("fusion")["top_k"] == 1000

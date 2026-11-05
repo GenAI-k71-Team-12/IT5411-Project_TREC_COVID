@@ -43,12 +43,13 @@ from trec_covid.evaluate.trec_eval import (  # noqa: E402
 from trec_covid.fuse.rrf import convex, rrf, weighted_rrf  # noqa: E402
 
 GRID = [round(i / 10, 1) for i in range(11)]
+TOP_K = int(load_config("fusion")["top_k"])  # đầu ra top-1000 theo hợp đồng
 
 
 def fuse_all(bm25: Run, dense: Run, fn) -> Run:
-    """Áp `fn(bm25_docs, dense_docs)` cho mọi topic có ở ít nhất một nhánh."""
+    """Áp `fn(bm25_docs, dense_docs)` cho mọi topic có ở ít nhất một nhánh, cắt còn TOP_K."""
     topics = sorted(bm25.keys() | dense.keys(), key=int)
-    return {t: fn(bm25.get(t, []), dense.get(t, [])) for t in topics}
+    return {t: fn(bm25.get(t, []), dense.get(t, []))[:TOP_K] for t in topics}
 
 
 def ndcg10(run: Run, qrels, metric: str) -> pd.Series:

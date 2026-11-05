@@ -96,13 +96,18 @@ def fuse(
     dense: Sequence[ScoredDocument],
     config: Mapping[str, Any],
 ) -> list[ScoredDocument]:
-    """Dung hợp theo `config["active"]` (khối `configs/fusion.yaml`)."""
+    """Dung hợp theo `config["active"]` (khối `configs/fusion.yaml`), cắt còn `top_k`.
+
+    Hợp hai top-1000 có tới ~1.800 bài; hợp đồng (DATA_CONTRACTS §2.3) giao top-1000.
+    """
     active = config.get("active")
     if active == "rrf":
-        return rrf(bm25, dense, k=int(config["rrf"]["k"]))
-    if active == "weighted_rrf":
+        fused = rrf(bm25, dense, k=int(config["rrf"]["k"]))
+    elif active == "weighted_rrf":
         c = config["weighted_rrf"]
-        return weighted_rrf(bm25, dense, float(c["w_bm25"]), float(c["w_dense"]), int(c["k"]))
-    if active == "convex":
-        return convex(bm25, dense, alpha=float(config["convex"]["alpha"]))
-    raise ValueError(f"fusion.active không hợp lệ: {active!r} (rrf | weighted_rrf | convex)")
+        fused = weighted_rrf(bm25, dense, float(c["w_bm25"]), float(c["w_dense"]), int(c["k"]))
+    elif active == "convex":
+        fused = convex(bm25, dense, alpha=float(config["convex"]["alpha"]))
+    else:
+        raise ValueError(f"fusion.active không hợp lệ: {active!r} (rrf | weighted_rrf | convex)")
+    return fused[: int(config.get("top_k", 1000))]
