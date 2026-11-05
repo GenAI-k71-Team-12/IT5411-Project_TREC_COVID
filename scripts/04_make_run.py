@@ -92,7 +92,15 @@ def postfilter_all(run: Run, mode: str) -> Run:
     return out
 
 
+def utf8_console() -> None:
+    """In tiếng Việt an toàn khi stdout bị redirect trên Windows (mặc định cp1252)."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
+    utf8_console()
     args = parse_args(argv)
     run = read_run(args.from_run) if args.from_run else fuse_and_rerank_all(args)
     mode = args.postfilter or str(load_config("postfilter")["mode"])
