@@ -91,6 +91,16 @@ def convex(
     return to_ranked(scores, "convex", _branch_metadata(bm25, dense))
 
 
+def drop_unmatched(bm25: Sequence[ScoredDocument]) -> list[ScoredDocument]:
+    """Bỏ bài BM25 điểm <= 0: điểm 0 nghĩa là không khớp từ nào, không phải hoà điểm.
+
+    bm25s vẫn trả đủ top-k với điểm 0 khi truy vấn không khớp (typo, từ ngoài từ vựng).
+    Giữ lại thì min-max cho chúng 1.0 và RRF xen chúng vào ngay từ hạng 1. Bài còn lại
+    giữ nguyên `rank` gốc (điểm dương luôn đứng trước điểm 0).
+    """
+    return [d for d in bm25 if d.score > 0]
+
+
 def fuse(
     bm25: Sequence[ScoredDocument],
     dense: Sequence[ScoredDocument],
@@ -100,6 +110,7 @@ def fuse(
 
     Hợp hai top-1000 có tới ~1.800 bài; hợp đồng (DATA_CONTRACTS §2.3) giao top-1000.
     """
+    bm25 = drop_unmatched(bm25)
     active = config.get("active")
     if active == "rrf":
         fused = rrf(bm25, dense, k=int(config["rrf"]["k"]))
