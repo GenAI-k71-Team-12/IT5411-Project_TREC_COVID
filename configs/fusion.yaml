@@ -8,6 +8,8 @@
 
 active: convex                # CV cao nhất trong 3 công thức (0.5937; weighted_rrf 0.5899; rrf 0.5730)
 
+top_k: 1000                   # đầu ra cuối là top-1000 (DATA_CONTRACTS §2.3), không phải cả hợp
+
 rrf:
   k: 60                       # Cormack et al., SIGIR 2009 — không tune
 
