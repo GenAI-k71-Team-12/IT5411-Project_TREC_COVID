@@ -3,7 +3,8 @@
 > **Bản nháp (2026-11-05). Người viết: Người 3.** Mọi con số lấy từ `results/2026-11-05_*.csv`, đo
 > với run dense **tạm**: Người 3 tự encode bằng MedCPT Article/Query Encoder để không phải chờ
 > nhánh của Người 2. Khi có `runs/dense.txt` chính thức, chạy lại
-> `07 → 04 → 04 --postfilter … → 08 → 09 → 10` rồi cập nhật các bảng có đánh dấu †.
+> `07` (nếu 07 báo tham số lệch thì sửa `configs/fusion.yaml`) `→ 04 → 04 --postfilter … → 08 → 09 → 10`
+> rồi cập nhật các bảng có đánh dấu †.
 
 ## 1. Dung hợp hai nhánh ở mức bài báo
 
@@ -120,17 +121,22 @@ mình. Độ đo để chọn là nDCG@10 condensed. Số báo cáo cho công th
 
 ### 5.2. Ablation 5 tầng †
 
-`results/2026-11-05_ablation.csv`
+`results/2026-11-05_ablation.csv`. BM25 và Dense là hai nhánh song song nên không có Δ. Δ của
+Fusion là so với nhánh đơn tốt nhất theo từng độ đo: BM25 với nDCG@10 thường, Dense với nDCG@10
+condensed. Các dòng sau so với dòng ngay trước. ‡ Fusion và các dòng sau dùng α = 0,3 chọn trên cả
+35 topic (in-sample), nên lạc quan hơn số CV ở mục 5.1 (0,5937).
 
 | Tầng | nDCG@10 | Δ | nDCG@10 condensed | Δ | MAP | P@5 | bpref |
 |---|---|---|---|---|---|---|---|
 | BM25 | 0,2155 | | 0,4601 | | 0,0609 | 0,2629 | 0,2648 |
-| Dense | 0,1387 | −0,0768 | 0,5943 | +0,1342 | 0,0437 | 0,1829 | 0,2960 |
-| Fusion (Convex) | 0,1801 | +0,0414 | 0,6014 | +0,0071 | 0,0633 | 0,2286 | 0,3380 |
-| + Rerank | **0,2230** | +0,0429 | **0,6289** | +0,0276 | **0,0707** | 0,2343 | **0,3382** |
+| Dense | 0,1387 | | 0,5943 | | 0,0437 | 0,1829 | 0,2960 |
+| Fusion (Convex) ‡ | 0,1801 | −0,0354 | 0,6014 | +0,0071 | 0,0633 | 0,2286 | 0,3380 |
+| + Rerank ‡ | **0,2230** | +0,0429 | **0,6289** | +0,0276 | **0,0707** | 0,2343 | **0,3382** |
 | + Residual (docids) | 0,2230 | 0 | 0,6289 | 0 | 0,0707 | 0,2343 | 0,3382 |
 | + Residual (judged) | 0 | −0,2230 | 0 | −0,6289 | 0 | 0 | 0 |
 
+- Dung hợp một mình **thấp hơn BM25** trên nDCG@10 thường (−0,0354). Trên condensed, nó chỉ hơn
+  Dense +0,0071 khi dùng tham số in-sample, còn với số CV thì thấp hơn Dense (0,5937 so với 0,5943).
 - **Rerank là tầng đóng góp rõ nhất** theo cả hai độ đo. Pipeline đầy đủ đạt nDCG@10 cao nhất
   (0,2230) và nDCG@10 condensed cao nhất (0,6289). Trên condensed, nó thắng Dense đơn lẻ ở 19
   topic và thua ở 13.
