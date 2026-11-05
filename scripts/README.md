@@ -9,7 +9,7 @@ theo số giai đoạn trong slide.
 | `02_build_bm25_index.py` | Doc Store -> Lucene BM25 | ~10 phút; `--backend bm25s` nếu không có Java |
 | `03_build_faiss_index.py` | Doc Store -> FAISS | **~2-3 giờ** (encode) |
 | `04_make_run.py` | Truy xuất + fusion + rerank -> run file | |
-| `05_evaluate.py` | run file + qrels -> điểm | cần binary `trec_eval` |
+| `05_evaluate.py` | run file + qrels -> điểm | `pytrec_eval` (ADR 0009) |
 | `06_serve_web.py` | chạy web | |
 
 **Đã chạy được:** `01`, `02` (nhánh dữ liệu + BM25, Người 1). Bốn script còn
