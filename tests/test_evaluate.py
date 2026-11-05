@@ -7,7 +7,14 @@ import math
 import pytest
 
 from trec_covid.evaluate.run_writer import read_run, write_run
-from trec_covid.evaluate.trec_eval import MEASURES, evaluate_run, load_qrels, summarize
+from trec_covid.evaluate.trec_eval import (
+    MEASURES,
+    condense,
+    evaluate_run,
+    judged_at_k,
+    load_qrels,
+    summarize,
+)
 from trec_covid.schemas import ScoredDocument
 
 QRELS_CSV = """topic-id,iteration,cord-id,judgement
@@ -96,3 +103,29 @@ class TestResultsCsv:
         assert header == "run,ndcg_cut_10"
         back = pd.read_csv(path, comment="#")
         assert back.loc[0, "ndcg_cut_10"] == 0.5
+
+
+class TestJudgedAtK:
+    def test_ty_le_bai_co_nhan_trong_top_k(self, qrels):
+        # d2 có nhãn 0 vẫn tính là ĐÃ CHẤM; x, y chưa chấm. Topic 36 không có qrels -> bỏ.
+        run = {"1": _ranked("d1", "x", "d2", "y"), "36": _ranked("z")}
+        judged = judged_at_k(run, qrels, k=4)
+        assert judged.to_dict() == {"1": 0.5}
+
+    def test_run_ngan_hon_k_van_chia_cho_k(self, qrels):
+        assert judged_at_k({"1": _ranked("d1")}, qrels, k=10)["1"] == pytest.approx(0.1)
+
+
+class TestCondense:
+    def test_bo_bai_chua_cham_roi_xep_lai(self, qrels):
+        run = {"1": _ranked("x", "d3", "y", "d1"), "36": _ranked("z")}
+        out = condense(run, qrels)
+        assert list(out) == ["1"]
+        assert [(d.cord_uid, d.rank) for d in out["1"]] == [("d3", 1), ("d1", 2)]
+
+    def test_ndcg_condensed_cao_hon_khi_bai_chua_cham_dung_dau(self, qrels):
+        run = {"1": _ranked("x", "y", "d1", "d3")}
+        raw = summarize(evaluate_run(run, qrels))["ndcg_cut_10"]
+        cond = summarize(evaluate_run(condense(run, qrels), qrels))["ndcg_cut_10"]
+        assert cond == pytest.approx(1.0)
+        assert raw < cond
