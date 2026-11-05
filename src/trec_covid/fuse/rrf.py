@@ -17,7 +17,8 @@ Mỗi kết quả ghi `bm25_rank`, `dense_rank`, `bm25_score`, `dense_score` và
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from trec_covid.fuse.ranking import to_ranked
 from trec_covid.schemas import ScoredDocument
@@ -61,3 +62,47 @@ def rrf(
 ) -> list[ScoredDocument]:
     """RRF chuẩn (Cormack et al., SIGIR 2009): mọi nhánh trọng số 1."""
     return weighted_rrf(bm25, dense, 1.0, 1.0, k, source="rrf")
+
+
+def _minmax(docs: Sequence[ScoredDocument]) -> dict[str, float]:
+    """Min-max trên CHÍNH danh sách của truy vấn này (không dùng hằng số [-1, 1]).
+
+    Điểm MedCPT co cụm ~[0.7, 0.95]; min-max theo thang lý thuyết sẽ nén mọi chênh lệch.
+    Mọi điểm bằng nhau (max = min) thì mọi doc có mặt nhận 1.0.
+    """
+    if not docs:
+        return {}
+    lo = min(d.score for d in docs)
+    hi = max(d.score for d in docs)
+    if hi == lo:
+        return {d.cord_uid: 1.0 for d in docs}
+    return {d.cord_uid: (d.score - lo) / (hi - lo) for d in docs}
+
+
+def convex(
+    bm25: Sequence[ScoredDocument], dense: Sequence[ScoredDocument], alpha: float
+) -> list[ScoredDocument]:
+    """Convex: `alpha * bm25_norm + (1 - alpha) * dense_norm`; doc vắng ở nhánh nào nhận 0."""
+    nb, nd = _minmax(bm25), _minmax(dense)
+    scores = {
+        uid: alpha * nb.get(uid, 0.0) + (1.0 - alpha) * nd.get(uid, 0.0)
+        for uid in nb.keys() | nd.keys()
+    }
+    return to_ranked(scores, "convex", _branch_metadata(bm25, dense))
+
+
+def fuse(
+    bm25: Sequence[ScoredDocument],
+    dense: Sequence[ScoredDocument],
+    config: Mapping[str, Any],
+) -> list[ScoredDocument]:
+    """Dung hợp theo `config["active"]` (khối `configs/fusion.yaml`)."""
+    active = config.get("active")
+    if active == "rrf":
+        return rrf(bm25, dense, k=int(config["rrf"]["k"]))
+    if active == "weighted_rrf":
+        c = config["weighted_rrf"]
+        return weighted_rrf(bm25, dense, float(c["w_bm25"]), float(c["w_dense"]), int(c["k"]))
+    if active == "convex":
+        return convex(bm25, dense, alpha=float(config["convex"]["alpha"]))
+    raise ValueError(f"fusion.active không hợp lệ: {active!r} (rrf | weighted_rrf | convex)")
