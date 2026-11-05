@@ -98,9 +98,9 @@ Vai trò của từng công thức — đây là **thiết kế thí nghiệm**,
 
 ### 4.1 Lọc residual
 
-Run của vòng 3 chỉ được chứa tài liệu nằm trong `docids-rnd3.txt` (tập tài liệu hợp lệ của vòng — đã loại các bài đã chấm ở vòng 1–2). Tài liệu ngoài tập này bị loại **trước khi** ghi run file, không phải sau.
+Run của vòng 3 chỉ được chứa tài liệu nằm trong `docids-rnd3.txt`. Đây là **danh sách được phép** (toàn bộ collection vòng 3, trùng khít Doc Store), **không** loại bài đã chấm, nên lọc theo nó không làm mất bài nào (ADR [0008](adr/0008-docids-rnd3-la-tap-duoc-phep.md)).
 
-Lý do: TREC-COVID dùng **residual collection** — mỗi vòng chỉ chấm trên phần tài liệu chưa được chấm. Trả về tài liệu đã chấm ở vòng trước là vi phạm thể lệ và làm điểm không so sánh được.
+Residual đúng nghĩa của TREC-COVID là việc khác: mỗi vòng chỉ chấm trên phần tài liệu chưa được chấm, nên với từng topic phải bỏ những bài đã có phán định ở vòng trước. Nguồn của nó là `qrels.csv`. Chấm cục bộ bằng chính qrels đó thì lọc kiểu này sẽ xoá các bài có nhãn, nên nó là chế độ tùy chọn và phải đo trước khi chốt (ADR 0005).
 
 ### 4.2 Trích dẫn mức câu (snippet)
 
