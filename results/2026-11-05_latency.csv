@@ -1,0 +1,7 @@
+# commit=bf87107 device=NVIDIA_RTX_2000_Ada_Generation_Laptop_GPU rerank_top_k=50 fusion=convex queries=40
+stage,median_ms,p95_ms,n,note
+bm25,3.3740,5.3740,40,
+fuse,2.8616,4.4549,40,
+rerank,231.2905,275.1552,40,
+pipeline,273.3160,326.6511,40,chưa gồm dense (đọc từ run file)
+dense,,,0,chưa có search_dense (Người 2)
