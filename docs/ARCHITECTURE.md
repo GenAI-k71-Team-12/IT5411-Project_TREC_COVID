@@ -129,7 +129,7 @@ Tách câu phải xử lý viết tắt y sinh: `et al.`, `i.e.`, `e.g.`, `Fig.`
 
 ## Đánh giá
 
-- **Công cụ:** `trec_eval` cục bộ (không nộp Kaggle).
+- **Công cụ:** `trec_eval` cục bộ qua `pytrec_eval-terrier` (không nộp Kaggle, ADR 0009). nDCG dùng gain tuyến tính (gain = nhãn).
 - **Chính:** `nDCG@10` — độ đo chuẩn của TREC-COVID.
 - **Phụ:** `nDCG@20`, `MAP`, `P@5`, `bpref`.
 - **Run file:** 6 cột `topicid Q0 docid rank score run-tag`.

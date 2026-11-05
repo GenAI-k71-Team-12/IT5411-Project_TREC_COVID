@@ -29,6 +29,6 @@ python-dotenv
 tqdm
 
 # ---- Đánh giá ----
-# trec_eval là chương trình C, tải riêng:
-#     https://github.com/usnistgov/trec_eval
-# Không có trên PyPI.
+# Bọc đúng mã C của trec_eval, có wheel cho Windows (ADR 0009).
+# Không cần tải binary trec_eval riêng.
+pytrec_eval-terrier
