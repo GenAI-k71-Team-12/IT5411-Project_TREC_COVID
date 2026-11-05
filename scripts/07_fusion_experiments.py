@@ -40,7 +40,7 @@ from trec_covid.evaluate.trec_eval import (  # noqa: E402
     load_qrels,
     summarize,
 )
-from trec_covid.fuse.rrf import convex, rrf, weighted_rrf  # noqa: E402
+from trec_covid.fuse.rrf import convex, drop_unmatched, rrf, weighted_rrf  # noqa: E402
 
 GRID = [round(i / 10, 1) for i in range(11)]
 TOP_K = int(load_config("fusion")["top_k"])  # đầu ra top-1000 theo hợp đồng
@@ -49,7 +49,7 @@ TOP_K = int(load_config("fusion")["top_k"])  # đầu ra top-1000 theo hợp đ�
 def fuse_all(bm25: Run, dense: Run, fn) -> Run:
     """Áp `fn(bm25_docs, dense_docs)` cho mọi topic có ở ít nhất một nhánh, cắt còn TOP_K."""
     topics = sorted(bm25.keys() | dense.keys(), key=int)
-    return {t: fn(bm25.get(t, []), dense.get(t, []))[:TOP_K] for t in topics}
+    return {t: fn(drop_unmatched(bm25.get(t, [])), dense.get(t, []))[:TOP_K] for t in topics}
 
 
 def ndcg10(run: Run, qrels, metric: str) -> pd.Series:
@@ -96,6 +96,20 @@ def grid_table(grids: dict[str, dict[float, dict[str, float]]]) -> pd.DataFrame:
             for p, s in grid.items()
         ]
     )
+
+
+def config_drift(cfg, w_bm25: float, alpha: float, active: str) -> list[str]:
+    """Các tham số trong configs/fusion.yaml lệch với kết quả tuning vừa chạy.
+
+    04 đọc tham số từ config còn 07 ghi run bằng tham số vừa tune: lệch mà không báo thì
+    bảng ablation trộn hai giá trị alpha khác nhau.
+    """
+    pairs = [
+        ("active", cfg["active"], active),
+        ("weighted_rrf.w_bm25", float(cfg["weighted_rrf"]["w_bm25"]), w_bm25),
+        ("convex.alpha", float(cfg["convex"]["alpha"]), alpha),
+    ]
+    return [f"{k}: config={old} != tuning={new}" for k, old, new in pairs if old != new]
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -150,6 +164,14 @@ def main(argv: list[str] | None = None) -> int:
     cols = ["run", "ndcg_cut_10", "ndcg10_condensed", "ndcg10_cv5", "bpref", "judged_10",
             "wins", "losses", "param"]  # fmt: skip
     print(table[cols].to_string(index=False, float_format=lambda x: f"{x:.4f}"))
+
+    cv_of = {"rrf": rrf_cv, "weighted_rrf": w_cv.cv_mean, "convex": a_cv.cv_mean}
+    drift = config_drift(cfg, w, a, max(cv_of, key=cv_of.get))
+    for d in drift:
+        print(f"[fusion] WARNING config lech ket qua tuning: {d}")
+    if drift:
+        print("[fusion] Sua configs/fusion.yaml theo dong tren TRUOC khi chay 04/08.")
+        return 3
     return 0
 
 
