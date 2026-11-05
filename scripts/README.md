@@ -12,8 +12,11 @@ theo số giai đoạn trong slide.
 | `05_evaluate.py` | run file + qrels -> điểm | `pytrec_eval` (ADR 0009) |
 | `06_serve_web.py` | chạy web | |
 | `07_fusion_experiments.py` | 2 run nhánh -> lưới w/α, CV 5-fold -> bảng so sánh fusion | ~5 giây; chọn theo nDCG@10 condensed (ADR 0010) |
+| `08_ablation.py` | các run theo tầng -> bảng ablation 5 tầng | `results/<ngày>_ablation.csv` |
+| `09_measure_latency.py` | đo median/p95 từng tầng | cần GPU cho rerank |
+| `10_check_reproducible.py` | manifest kết quả, so sánh giữa 2 máy | độ đo 4 chữ số + thứ tự top-10 |
 
-**Đã chạy được:** `01`, `02` (nhánh dữ liệu + BM25, Người 1); `04`, `05`, `07` (fusion,
+**Đã chạy được:** `01`, `02` (nhánh dữ liệu + BM25, Người 1); `04`, `05`, `07`–`10` (fusion,
 rerank, đánh giá, Người 3). Các script còn lại mới ở mức khung (chưa có mã).
 
 Tất cả script đọc tham số từ `configs/` (`--config bm25`), không hard-code
