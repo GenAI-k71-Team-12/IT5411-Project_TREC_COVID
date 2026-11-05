@@ -145,3 +145,28 @@ def test_config_fusion_top_k_1000():
     from trec_covid.config import load_config
 
     assert load_config("fusion")["top_k"] == 1000
+
+
+ZERO_BM25 = [ScoredDocument(f"junk_{i}", 0.0, rank=i + 1, source="bm25") for i in range(5)]
+
+
+def test_bm25_toan_diem_0_khong_lap_danh_sach_bang_bai_rac():
+    # Truy vấn không khớp từ nào (typo): bm25s vẫn trả 1000 bài điểm 0. Điểm 0 nghĩa là
+    # không khớp từ nào, không phải "hoà điểm" -> bỏ trước khi dung hợp.
+    for cfg in (
+        {"active": "convex", "convex": {"alpha": 0.3}},
+        {"active": "rrf", "rrf": {"k": 60}},
+    ):
+        out = fuse(ZERO_BM25, MOCK_DENSE_RESULTS, cfg)
+        assert _uids(out) == _uids(MOCK_DENSE_RESULTS)
+
+
+def test_bm25_khop_mot_phan_chi_giu_bai_co_diem_duong():
+    partial = MOCK_BM25_RESULTS[:1] + [ScoredDocument("junk", 0.0, rank=2, source="bm25")]
+    out = fuse(partial, MOCK_DENSE_RESULTS, {"active": "rrf", "rrf": {"k": 60}})
+    assert "junk" not in _uids(out)
+
+
+def test_convex_mot_nhanh_rong_alpha_giua():
+    out = fuse([], MOCK_DENSE_RESULTS, {"active": "convex", "convex": {"alpha": 0.3}})
+    assert _uids(out) == _uids(MOCK_DENSE_RESULTS)
