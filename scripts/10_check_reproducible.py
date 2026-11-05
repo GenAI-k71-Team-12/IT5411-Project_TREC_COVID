@@ -44,7 +44,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
+def utf8_console() -> None:
+    """In tiếng Việt an toàn khi stdout bị redirect trên Windows (mặc định cp1252)."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
+    utf8_console()
     args = parse_args(argv)
     cfg = load_config("fusion")
     qrels = load_qrels(resolve_any_path(cfg, "qrels", "competition"))

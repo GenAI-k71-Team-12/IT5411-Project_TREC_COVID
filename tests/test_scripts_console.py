@@ -30,3 +30,24 @@ def test_make_run_ghi_duoc_run_khi_stdout_la_cp1252(tmp_path):
     )
     assert proc.returncode == 0, proc.stderr.decode("utf-8", "replace")
     assert out.read_text(encoding="utf-8").splitlines()[0] == "1 Q0 d1 1 2.000000 out"
+
+
+def test_check_reproducible_khong_crash_va_bao_dung_khi_cp1252(tmp_path):
+    # Cần run thật trong runs/ (không có trên máy chưa chạy pipeline) -> skip.
+    import pytest
+
+    if not (ROOT / "runs" / "rerank_judged.txt").is_file():
+        pytest.skip("chưa có runs/ của pipeline")
+    first = tmp_path / "a.json"
+    proc = _run_cp1252(["scripts/10_check_reproducible.py", "--write", str(first)])
+    assert proc.returncode == 0, proc.stderr.decode("utf-8", "replace")
+    proc = _run_cp1252(
+        [
+            "scripts/10_check_reproducible.py",
+            "--write",
+            str(tmp_path / "b.json"),
+            "--compare",
+            str(first),
+        ]
+    )
+    assert proc.returncode == 0, proc.stderr.decode("utf-8", "replace")
