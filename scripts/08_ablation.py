@@ -56,6 +56,10 @@ def main(argv: list[str] | None = None) -> int:
         else default_stages(fusion["active"])
     )
     table = ablation_table(stages, load_qrels(resolve_any_path(fusion, "qrels", "competition")))
+    if not args.stage:
+        # Tham số fusion là best-all (chọn trên chính 35 topic): lạc quan hơn số CV trung thực.
+        table["note"] = ""
+        table.loc[2:, "note"] = "tham số fusion in-sample; số CV ở fusion-comparison (ndcg10_cv5)"
 
     active = fusion["active"]
     params = {k: v for k, v in fusion.get(active, {}).items() if k != "minmax_scope"}
