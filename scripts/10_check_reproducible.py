@@ -8,6 +8,7 @@ Máy 2 (clone sạch, đặt dữ liệu vào data/, chạy lại pipeline):
     python scripts/02_build_bm25_index.py --backend bm25s
     (sinh runs/bm25.txt, runs/dense.txt theo hướng dẫn của Người 1, Người 2)
     python scripts/07_fusion_experiments.py
+    (07 thoát mã 3 nếu tham số tune lệch configs/fusion.yaml: sửa config rồi chạy tiếp)
     python scripts/04_make_run.py --out runs/rerank.txt
     python scripts/04_make_run.py --from-run runs/rerank.txt --postfilter docids --out runs/rerank_docids.txt
     python scripts/04_make_run.py --from-run runs/rerank.txt --postfilter judged --out runs/rerank_judged.txt
@@ -44,7 +45,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
+def utf8_console() -> None:
+    """In tiếng Việt an toàn khi stdout bị redirect trên Windows (mặc định cp1252)."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
+    utf8_console()
     args = parse_args(argv)
     cfg = load_config("fusion")
     qrels = load_qrels(resolve_any_path(cfg, "qrels", "competition"))
