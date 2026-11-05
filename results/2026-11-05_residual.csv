@@ -1,0 +1,5 @@
+# commit=bfc9ce7 qrels=qrels.csv runs=rerank_off.txt;rerank_docids.txt;rerank_judged.txt
+run,ndcg_cut_10,ndcg_cut_20,map,P_5,bpref,n_topics
+rerank_off,0.2230,0.2114,0.0707,0.2343,0.3382,35
+rerank_docids,0.2230,0.2114,0.0707,0.2343,0.3382,35
+rerank_judged,0.0000,0.0000,0.0000,0.0000,0.0000,35
