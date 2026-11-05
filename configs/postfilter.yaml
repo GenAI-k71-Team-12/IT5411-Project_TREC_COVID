@@ -1,0 +1,6 @@
+# GĐ4 — postfilter sau thứ hạng cuối (ADR 0005, ADR 0008)
+#   off     không lọc — mặc định cho đánh giá offline và UI
+#   docids  chỉ giữ bài trong docids-rnd3.txt (danh sách ĐƯỢC PHÉP; no-op với Doc Store 19/05)
+#   judged  residual TREC: bỏ bài đã chấm ở vòng trước cho từng topic (từ qrels)
+#           -> chấm cục bộ bằng chính qrels đó sẽ xoá bài có nhãn; KHÔNG bật trên UI
+mode: "off"                   # PHẢI có ngoặc kép: YAML đọc off trần thành False
