@@ -57,7 +57,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
+def utf8_console() -> None:
+    """In tiếng Việt an toàn khi stdout bị redirect trên Windows (mặc định cp1252)."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
+    utf8_console()
     args = parse_args(argv)
     fusion_cfg, rerank_cfg = load_config("fusion"), load_config("rerank")
     topics = load_topics(resolve_any_path(fusion_cfg, "topics", "competition"))
