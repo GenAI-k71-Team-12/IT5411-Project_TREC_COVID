@@ -1,0 +1,76 @@
+{
+  "runs": {
+    "bm25": {
+      "metrics": {
+        "P_5": 0.2629,
+        "bpref": 0.2648,
+        "map": 0.0609,
+        "n_topics": 35.0,
+        "ndcg_cut_10": 0.2155,
+        "ndcg_cut_20": 0.1897
+      },
+      "order_sha256": "e435a4cf815c122346e932e7262d248c62c6b14b85e14b695f713eec46d999cf",
+      "top10_sha256": "c061541fd188c19f70488c61a2a39825ad9bddd2d8283d79a91f4a4e7e0643e8"
+    },
+    "convex": {
+      "metrics": {
+        "P_5": 0.2286,
+        "bpref": 0.338,
+        "map": 0.0633,
+        "n_topics": 35.0,
+        "ndcg_cut_10": 0.1801,
+        "ndcg_cut_20": 0.1687
+      },
+      "order_sha256": "27876700996ce56fdd2834942856ffd3e2b542de778da7ec50a9c751047b05f7",
+      "top10_sha256": "3223a14ce17c1058f60237939ac55cf5d9b29b25dde283a9a33ae20fa436842f"
+    },
+    "dense": {
+      "metrics": {
+        "P_5": 0.1829,
+        "bpref": 0.296,
+        "map": 0.0437,
+        "n_topics": 35.0,
+        "ndcg_cut_10": 0.1387,
+        "ndcg_cut_20": 0.1276
+      },
+      "order_sha256": "5f9a8b34c7ea27ac18dd5ad4619f1ef3e2c9702f371a986f79f43b47f528660f",
+      "top10_sha256": "9e4b9cc0ced01deb84149891a74b6ee603480e51c5804599f8f4dcbce6977e6d"
+    },
+    "rerank": {
+      "metrics": {
+        "P_5": 0.2343,
+        "bpref": 0.3382,
+        "map": 0.0707,
+        "n_topics": 35.0,
+        "ndcg_cut_10": 0.223,
+        "ndcg_cut_20": 0.2114
+      },
+      "order_sha256": "531904b38a0cd96abb034a6df8eec048444432ebe1c90849ee757d8ccee3a030",
+      "top10_sha256": "86c31e77fad230305f2b4f8a6e9a1d93959e1ac7f925606c9974baa6ebb23850"
+    },
+    "rerank_docids": {
+      "metrics": {
+        "P_5": 0.2343,
+        "bpref": 0.3382,
+        "map": 0.0707,
+        "n_topics": 35.0,
+        "ndcg_cut_10": 0.223,
+        "ndcg_cut_20": 0.2114
+      },
+      "order_sha256": "531904b38a0cd96abb034a6df8eec048444432ebe1c90849ee757d8ccee3a030",
+      "top10_sha256": "86c31e77fad230305f2b4f8a6e9a1d93959e1ac7f925606c9974baa6ebb23850"
+    },
+    "rerank_judged": {
+      "metrics": {
+        "P_5": 0.0,
+        "bpref": 0.0,
+        "map": 0.0,
+        "n_topics": 35.0,
+        "ndcg_cut_10": 0.0,
+        "ndcg_cut_20": 0.0
+      },
+      "order_sha256": "d294c8c5cd9bbb7cdd9aff7115c0d928c0d63ad99d75c344304ec1439e387e6a",
+      "top10_sha256": "0dd3f5213bd2708937e2abfb4d14b8580ec01dfeacd3a1d079479de79e82f328"
+    }
+  }
+}
