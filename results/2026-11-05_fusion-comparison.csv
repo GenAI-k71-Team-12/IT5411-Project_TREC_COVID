@@ -1,7 +1,7 @@
-# commit=5cabee5 metric=condensed cv=5fold-seed42 tags=bm25;dense-tmp config=fusion
+# commit=64563ce metric=condensed cv=5fold-seed42 tags=bm25;dense-tmp config=fusion
 run,ndcg_cut_10,ndcg_cut_20,map,P_5,bpref,n_topics,ndcg10_condensed,judged_10,ndcg10_cv5,param,delta_vs_best_single,wins,losses,best_single
 bm25,0.2155,0.1897,0.0609,0.2629,0.2648,35,0.4601,0.4257,,,-0.1342,12,23,dense
 dense,0.1387,0.1276,0.0437,0.1829,0.2960,35,0.5943,0.2057,,,0.0000,0,0,dense
-rrf,0.2068,0.2050,0.0775,0.2400,0.3634,35,0.5730,0.3514,0.5730,k=60,-0.0213,15,19,dense
-weighted_rrf,0.1869,0.1755,0.0702,0.2286,0.3707,35,0.6019,0.3000,0.5899,"w_bm25=0.4 folds=[0.4, 0.4, 0.4, 0.4, 0.2]",0.0076,13,20,dense
-convex,0.1801,0.1687,0.0678,0.2286,0.3799,35,0.6014,0.2829,0.5937,"alpha=0.3 folds=[0.3, 0.4, 0.3, 0.3, 0.4]",0.0071,13,18,dense
+rrf,0.2068,0.2050,0.0732,0.2400,0.3248,35,0.5730,0.3514,0.5730,k=60,-0.0213,15,19,dense
+weighted_rrf,0.1869,0.1755,0.0659,0.2286,0.3288,35,0.6019,0.3000,0.5899,"w_bm25=0.4 folds=[0.4, 0.4, 0.4, 0.4, 0.2]",0.0076,13,20,dense
+convex,0.1801,0.1687,0.0633,0.2286,0.3380,35,0.6014,0.2829,0.5937,"alpha=0.3 folds=[0.3, 0.4, 0.3, 0.3, 0.4]",0.0071,13,18,dense
