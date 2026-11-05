@@ -8,7 +8,7 @@ theo số giai đoạn trong slide.
 | `01_build_docstore.py` | CORD-19 -> Doc Store | ~5 phút; `--minimal` = đợt bàn giao 1 |
 | `02_build_bm25_index.py` | Doc Store -> Lucene BM25 | ~10 phút; `--backend bm25s` nếu không có Java |
 | `03_build_faiss_index.py` | Doc Store -> FAISS | **~2-3 giờ** (encode) |
-| `04_make_run.py` | 2 run nhánh -> fusion -> rerank -> run file | rerank top-50 ~0,2 s/truy vấn (GPU) |
+| `04_make_run.py` | 2 run nhánh -> fusion -> rerank -> postfilter -> run file | rerank top-50 ~0,2 s/truy vấn (GPU) |
 | `05_evaluate.py` | run file + qrels -> điểm | `pytrec_eval` (ADR 0009) |
 | `06_serve_web.py` | chạy web | |
 | `07_fusion_experiments.py` | 2 run nhánh -> lưới w/α, CV 5-fold -> bảng so sánh fusion | ~5 giây; chọn theo nDCG@10 condensed (ADR 0010) |
