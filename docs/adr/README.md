@@ -9,13 +9,11 @@ ADR mới thay thế ADR cũ.
 | [0002](0002-danh-gia-bang-trec-eval-cuc-bo.md) | Đánh giá bằng trec_eval cục bộ, không nộp Kaggle | chấp nhận |
 | [0003](0003-tach-cau-luc-truy-van.md) | Tách câu lúc truy vấn, không lưu sentences[] | chấp nhận |
 | [0004](0004-snippet-trich-nguyen-van.md) | Snippet là trích nguyên văn, không sinh văn bản | chấp nhận |
+| [0005](0005-loc-residual.md) | Postfilter residual là chế độ tùy chọn, mặc định tắt | chấp nhận |
 | [0006](0006-mot-truong-van-ban-lap-title.md) | Một trường văn bản, lặp title để xấp xỉ `title² + abstract` | chấp nhận |
 | [0007](0007-mot-lan-chuan-hoa-dung-chung.md) | Một làn chuẩn hoá an toàn dùng chung cho BM25 và encoder | chấp nhận |
 | [0009](0009-cham-bang-pytrec-eval.md) | Chấm bằng `pytrec_eval-terrier` thay cho binary `trec_eval` | chấp nhận |
 | [0010](0010-tuning-fusion-bang-cv-5-fold.md) | Tuning fusion bằng 5-fold CV theo topic, chọn theo nDCG@10 condensed | chấp nhận |
-
-> Số **0005** để trống: dành cho quyết định về postfilter residual (Người 3,
-> Mốc 5.4 trong `docs/ROADMAP.md`).
 
 ## Khi nào cần ADR
 
