@@ -105,7 +105,7 @@ TREC_COVID_TVDL/
 | Mô hình | `transformers`, `torch` | MedCPT: Query / Article / Cross — 3 checkpoint riêng |
 | Dữ liệu | `pandas`, `pyarrow` | đọc `metadata.csv` |
 | Web | `flask` | chạy cục bộ, không cần mạng |
-| Đánh giá | `trec_eval` (binary) | tải riêng, không phải package Python |
+| Đánh giá | `pytrec_eval-terrier` | bọc mã C của `trec_eval`, cài bằng pip (ADR 0009) |
 
 > **Không dùng** `rank_bm25`: quét O(N) mỗi truy vấn, làm chậm mọi lần chạy ablation.
 
