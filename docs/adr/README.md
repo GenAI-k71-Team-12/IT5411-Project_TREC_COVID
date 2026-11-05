@@ -13,6 +13,7 @@ ADR mới thay thế ADR cũ.
 | [0007](0007-mot-lan-chuan-hoa-dung-chung.md) | Một làn chuẩn hoá an toàn dùng chung cho BM25 và encoder | chấp nhận |
 | [0008](0008-docids-rnd3-la-tap-duoc-phep.md) | `docids-rnd3.txt` là danh sách được phép, không phải danh sách bị loại | chấp nhận |
 | [0009](0009-cham-bang-pytrec-eval.md) | Chấm bằng `pytrec_eval-terrier` thay cho binary `trec_eval` | chấp nhận |
+| [0010](0010-tuning-fusion-bang-cv-5-fold.md) | Tuning fusion bằng 5-fold CV theo topic, chọn theo nDCG@10 condensed | chấp nhận |
 
 > Số **0005** để trống: dành cho quyết định về postfilter residual (Người 3,
 > Mốc 5.4 trong `docs/ROADMAP.md`).
