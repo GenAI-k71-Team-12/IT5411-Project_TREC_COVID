@@ -148,6 +148,7 @@ python scripts/01_build_docstore.py
 
 python scripts/02_build_bm25_index.py    # Doc Store → Lucene BM25
 python scripts/03_build_faiss_index.py   # Doc Store → FAISS (~2–3 giờ)
+python scripts/11_make_dense_run.py      # FAISS → runs/dense.txt (baseline)
 python scripts/04_make_run.py --config configs/fusion.yaml
 python scripts/05_evaluate.py --run runs/rrf.txt
 python scripts/06_serve_web.py           # http://localhost:5000
