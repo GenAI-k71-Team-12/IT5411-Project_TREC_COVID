@@ -2,13 +2,12 @@
 model:
   query_encoder:   ncbi/MedCPT-Query-Encoder
   article_encoder: ncbi/MedCPT-Article-Encoder
-  # LƯU Ý: hai checkpoint phải đi cùng nhau.
-  # Trộn Query-Encoder với Article-Encoder của model khác sẽ ra vector
-  # ở hai không gian khác nhau -> cosine vô nghĩa.
+  # Hai checkpoint phải đi cùng nhau (cùng không gian vector).
 
 embedding:
   dim: 768
-  max_length: 512
+  article_max_length: 512     # title + abstract
+  query_max_length: 64        # MedCPT Query-Encoder huấn luyện với 64
   normalize_l2: true          # bắt buộc: IP = cos chỉ khi đã chuẩn hoá
 
 index:
@@ -16,7 +15,9 @@ index:
   path: indexes/faiss/articles.faiss
 
 encode:
-  batch_size: 32
+  batch_size: 64              # RTX 3080 10 GB + fp16: 64 ổn; hết VRAM thì giảm 32
+  chunk_size: 4096            # số bài mỗi chunk lưu đĩa (để chạy tiếp được khi bị ngắt)
+  fp16: true                  # chỉ có tác dụng trên CUDA
   device: auto
 
 top_k: 1000

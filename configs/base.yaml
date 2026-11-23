@@ -6,6 +6,8 @@ paths:
   doc_store:     data/processed/doc_store.parquet
   lucene_index:  indexes/lucene
   faiss_index:   indexes/faiss/articles.faiss
+  docid_order:   data/processed/docid_order.parquet
+  embeddings:    data/interim/dense            # thư mục chứa các chunk .npy
   runs:          runs
   results:       results
   models:        models
