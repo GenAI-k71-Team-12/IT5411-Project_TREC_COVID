@@ -16,6 +16,8 @@
 - Phải **chuẩn hoá L2 vector bài báo** trước khi nạp, nếu không `IP` không
   bằng `cosine`.
 
+`faiss/` gồm 3 file đi cùng nhau: `articles.faiss`, `articles.docids.txt` (position -> cord_uid), `articles.meta.json`.
+
 ## Chia sẻ trong nhóm
 
 Chép qua ổ cứng ngoài, kèm mã băm để kiểm tra:
@@ -26,3 +28,5 @@ Get-FileHash indexes\faiss\articles.faiss -Algorithm SHA256
 
 Ghi mã băm vào `docs/` để người khác đối chiếu. Mã khác nhau = một trong hai
 bên đã dựng lại chỉ mục bằng cấu hình khác.
+
+Trên Linux: `sha256sum indexes/faiss/articles.faiss`.
